@@ -39,7 +39,7 @@ const ListingPage: NextPage = () => {
 
   useEffect(() => {
     (async () => {
-      // for listings of type Auction we want to store the bidding information
+      // for listings of type Auction we want to store the bidding information for display purposes
       if (listing && listing.type === ListingType.Auction) {
         const bid = await marketplace?.auction.getWinningBid(listingId);
         setWinningBid(bid);
