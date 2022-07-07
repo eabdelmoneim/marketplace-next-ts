@@ -1,6 +1,6 @@
 import React from "react";
 import type { AppProps } from "next/app";
-import { ChainId, ThirdwebProvider } from "@thirdweb-dev/react";
+import { ChainId, IpfsStorage, ThirdwebProvider } from "@thirdweb-dev/react";
 import "../styles/globals.css";
 import Head from "next/head";
 import ThirdwebGuideFooter from "../components/ThirdwebGuideFooter";
@@ -11,7 +11,10 @@ const activeChainId = ChainId.Rinkeby;
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <ThirdwebProvider desiredChainId={activeChainId}>
+    <ThirdwebProvider
+      desiredChainId={activeChainId}
+      storageInterface={new IpfsStorage("https://ipfs.thirdweb.com/ipfs/")}
+    >
       <Head>
         <title>thirdweb Marketplace with Next.JS</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />

@@ -4,11 +4,12 @@ import {
   useNetwork,
   useNetworkMismatch,
   useListing,
+  useWinningBid,
 } from "@thirdweb-dev/react";
 import { ChainId, ListingType, NATIVE_TOKENS } from "@thirdweb-dev/sdk";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { Component, useState } from "react";
 import styles from "../../styles/Home.module.css";
 
 const ListingPage: NextPage = () => {
@@ -26,7 +27,7 @@ const ListingPage: NextPage = () => {
 
   // Initialize the marketplace contract
   const marketplace = useMarketplace(
-    "0x277C0FB19FeD09c785448B8d3a80a78e7A9B8952" // Your marketplace contract address here
+    "0x52Fc314f1007FEc6525ed5Ae4896eA277269Be24" // Your marketplace contract address here
   );
 
   // Fetch the listing from the marketplace contract
@@ -34,6 +35,12 @@ const ListingPage: NextPage = () => {
     marketplace,
     listingId
   );
+
+  const {
+    data: winningBid,
+    isLoading: loadingHighestBid,
+    error,
+  } = useWinningBid(marketplace, listingId);
 
   // Store the bid amount the user entered into the bidding textbox
   const [bidAmount, setBidAmount] = useState<string>("");
@@ -45,7 +52,6 @@ const ListingPage: NextPage = () => {
   if (!listing) {
     return <div className={styles.loadingOrError}>Listing not found</div>;
   }
-
   async function createBidOrOffer() {
     try {
       // Ensure user is on the correct network
@@ -97,6 +103,29 @@ const ListingPage: NextPage = () => {
     }
   }
 
+  function renderPriceInfo() {
+    // if Direct listing render the sale price
+    if (listing?.type === ListingType.Direct) {
+      return (
+        <b>
+          Sale Price: {listing.buyoutCurrencyValuePerToken.displayValue}{" "}
+          {listing.buyoutCurrencyValuePerToken.symbol}
+        </b>
+      );
+    } else {
+      return (
+        <b>
+          Buyout Price: {listing?.buyoutCurrencyValuePerToken.displayValue}{" "}
+          {listing?.buyoutCurrencyValuePerToken.symbol}
+          <br></br>
+          Current Highest Bid: {winningBid?.currencyValue.displayValue}{" "}
+          {winningBid?.currencyValue.symbol}
+          <h6>Highest Bidder: {winningBid?.buyerAddress}</h6>
+        </b>
+      );
+    }
+  }
+
   return (
     <div className={styles.container} style={{}}>
       <div className={styles.listingContainer}>
@@ -118,10 +147,7 @@ const ListingPage: NextPage = () => {
             </b>
           </p>
 
-          <h2>
-            <b>{listing.buyoutCurrencyValuePerToken.displayValue}</b>{" "}
-            {listing.buyoutCurrencyValuePerToken.symbol}
-          </h2>
+          <h4>{renderPriceInfo()}</h4>
 
           <div
             style={{
