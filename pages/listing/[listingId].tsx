@@ -4,12 +4,11 @@ import {
   useNetwork,
   useNetworkMismatch,
   useListing,
-  useWinningBid,
 } from "@thirdweb-dev/react";
-import { ChainId, ListingType, NATIVE_TOKENS } from "@thirdweb-dev/sdk";
+import { ChainId, ListingType, NATIVE_TOKENS, Offer } from "@thirdweb-dev/sdk";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import { Component, useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "../../styles/Home.module.css";
 
 const ListingPage: NextPage = () => {
@@ -36,11 +35,17 @@ const ListingPage: NextPage = () => {
     listingId
   );
 
-  const {
-    data: winningBid,
-    isLoading: loadingHighestBid,
-    error,
-  } = useWinningBid(marketplace, listingId);
+  const [winningBid, setWinningBid] = useState<Offer>();
+
+  useEffect(() => {
+    (async () => {
+      // for listings of type Auction we want to store the bidding information
+      if (listing && listing.type === ListingType.Auction) {
+        const bid = await marketplace?.auction.getWinningBid(listingId);
+        setWinningBid(bid);
+      }
+    })();
+  }, [listing, listingId, marketplace]);
 
   // Store the bid amount the user entered into the bidding textbox
   const [bidAmount, setBidAmount] = useState<string>("");
@@ -112,7 +117,9 @@ const ListingPage: NextPage = () => {
           {listing.buyoutCurrencyValuePerToken.symbol}
         </b>
       );
-    } else {
+    }
+    // if Auction listing render information about the buyout price, current highest bid
+    else {
       return (
         <b>
           Buyout Price: {listing?.buyoutCurrencyValuePerToken.displayValue}{" "}
