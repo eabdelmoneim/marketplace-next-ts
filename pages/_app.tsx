@@ -14,6 +14,9 @@ function MyApp({ Component, pageProps }: AppProps) {
     <ThirdwebProvider
       desiredChainId={activeChainId}
       storageInterface={new IpfsStorage("https://ipfs.thirdweb.com/ipfs/")}
+      chainRpc={{
+        [ChainId.Rinkeby]: process.env.RPC_URL,
+      }}
     >
       <Head>
         <title>thirdweb Marketplace with Next.JS</title>
