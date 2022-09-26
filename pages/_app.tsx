@@ -1,6 +1,6 @@
 import React from "react";
 import type { AppProps } from "next/app";
-import { ChainId, IpfsStorage, ThirdwebProvider } from "@thirdweb-dev/react";
+import { ChainId, ThirdwebProvider } from "@thirdweb-dev/react";
 import "../styles/globals.css";
 import Head from "next/head";
 import ThirdwebGuideFooter from "../components/ThirdwebGuideFooter";
@@ -13,7 +13,6 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ThirdwebProvider
       desiredChainId={activeChainId}
-      storageInterface={new IpfsStorage("https://ipfs.thirdweb.com/ipfs/")}
       chainRpc={{
         [ChainId.Rinkeby]: process.env.RPC_URL,
       }}
